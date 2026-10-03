@@ -2,6 +2,7 @@ package com.applianceoptimizer.controller;
 
 import com.applianceoptimizer.entity.*; import com.applianceoptimizer.repository.*; import com.applianceoptimizer.service.EnergyService;
 import jakarta.validation.Valid; import jakarta.validation.constraints.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.http.*; import org.springframework.validation.annotation.Validated; import org.springframework.web.bind.annotation.*;
 import java.time.LocalTime; import java.util.*;
 
@@ -15,6 +16,7 @@ public class ApiController {
  @PutMapping("/appliances/{id}") public Appliance update(@PathVariable Long id,@Valid @RequestBody Appliance data){Appliance a=appliances.findById(id).orElseThrow(()->new NoSuchElementException("Appliance not found"));a.setName(data.getName());a.setCategory(data.getCategory());a.setRatedPower(data.getRatedPower());a.setDailyUsageHours(data.getDailyUsageHours());a.setPriority(data.getPriority());a.setActive(data.isActive());return appliances.save(a);}
  @PatchMapping("/appliances/{id}/status") public Appliance status(@PathVariable Long id,@RequestBody Map<String,Boolean> body){Appliance a=appliances.findById(id).orElseThrow(()->new NoSuchElementException("Appliance not found"));a.setActive(Boolean.TRUE.equals(body.get("active")));return appliances.save(a);}
  @DeleteMapping("/appliances/{id}") public ResponseEntity<Void> delete(@PathVariable Long id){if(!appliances.existsById(id))throw new NoSuchElementException("Appliance not found");records.deleteByApplianceId(id);schedules.deleteAll(schedules.findAll().stream().filter(s->s.getAppliance().getId().equals(id)).toList());appliances.deleteById(id);return ResponseEntity.noContent().build();}
+ @PostMapping("/reset") @Transactional public ResponseEntity<Void> reset(){schedules.deleteAllInBatch();records.deleteAllInBatch();appliances.deleteAllInBatch();settings.save(new AppSettings());return ResponseEntity.noContent().build();}
  @GetMapping("/settings") public AppSettings getSettings(){return settings.findById(1L).orElseGet(()->settings.save(new AppSettings()));}
  @PutMapping("/settings") public AppSettings saveSettings(@RequestBody AppSettings data){if(data.getElectricityRate()<=0||data.getDailyThreshold()<0||data.getMonthlyThreshold()<0||data.getMaxApplianceUsage()<0||data.getMaxApplianceUsage()>24)throw new IllegalArgumentException("Rate must be positive. Thresholds must be non-negative and max usage must be 0–24 hours.");AppSettings s=getSettings();s.setElectricityRate(data.getElectricityRate());s.setDailyThreshold(data.getDailyThreshold());s.setMonthlyThreshold(data.getMonthlyThreshold());s.setMaxApplianceUsage(data.getMaxApplianceUsage());return settings.save(s);}
  @GetMapping("/schedules") public List<UsageSchedule> schedules(){return schedules.findAll();}

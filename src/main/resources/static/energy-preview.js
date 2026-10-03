@@ -9,3 +9,18 @@ function updateEnergyPreview(){
 }
 powerInput.addEventListener("input",updateEnergyPreview);hoursInput.addEventListener("input",updateEnergyPreview);
 const existingOpenModal=window.openModal;window.openModal=function(appliance){existingOpenModal(appliance);updateEnergyPreview();};
+
+const resetButton=document.createElement("button");
+resetButton.type="button";
+resetButton.textContent="Reset data";
+resetButton.style.cssText="border:1px solid #edc8c5;background:#fff;color:#a33f37;border-radius:8px;padding:11px 14px;font:600 12px 'DM Sans',sans-serif;cursor:pointer";
+document.querySelector(".header-right").prepend(resetButton);
+resetButton.addEventListener("click",async()=>{
+  if(!confirm("Reset all household data? This permanently deletes every appliance, schedule, and usage record, and restores default preferences."))return;
+  resetButton.disabled=true;
+  try{
+    const response=await fetch("/api/reset",{method:"POST"});
+    if(!response.ok)throw new Error("Reset failed ("+response.status+").");
+    location.reload();
+  }catch(error){alert(error.message||"Could not reset household data.");resetButton.disabled=false;}
+});
