@@ -1,0 +1,8 @@
+.git
+**/.git
+target
+**/target
+data
+**/data
+*.mv.db
+*.trace.db

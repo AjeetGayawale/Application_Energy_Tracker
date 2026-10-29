@@ -20,7 +20,7 @@ Households often lack a simple way to understand which appliances drive their el
 
 ## Technology
 
-Java 17+, Spring Boot 3, Spring Web, Spring Data JPA, Jakarta Validation, Maven, H2 for a no-setup local run, and MySQL Connector/J for MySQL deployments. The chart uses Chart.js from its public CDN.
+Java 17+, Spring Boot 3, Spring Web, Spring Data JPA, Jakarta Validation, Maven, H2 for a no-setup local run, and the PostgreSQL JDBC driver for hosted PostgreSQL deployments. The chart uses Chart.js from its public CDN.
 
 ## Architecture
 
@@ -55,15 +55,15 @@ mvn spring-boot:run
 
 Open [http://localhost:8080](http://localhost:8080). The default database is persistent, file-backed H2 at `./data/appliance-energy`; its console is at `/h2-console` (JDBC URL `jdbc:h2:file:./data/appliance-energy`, user `sa`, blank password).
 
-To use MySQL, create a database and provide connection values as environment variables before starting:
+To use PostgreSQL, create a database and provide connection values as environment variables before starting:
 
 ```text
-DB_URL=jdbc:mysql://localhost:3306/appliance_energy?createDatabaseIfNotExist=true
-DB_USERNAME=your_mysql_user
-DB_PASSWORD=your_mysql_password
+DB_URL=jdbc:postgresql://localhost:5432/appliance_energy
+DB_USERNAME=your_postgres_user
+DB_PASSWORD=your_postgres_password
 ```
 
-The MySQL JDBC driver is included. Hibernate manages the schema with `ddl-auto=update`. No login credentials are required by this student demo.
+The PostgreSQL JDBC driver is included. Hibernate manages the schema with `ddl-auto=update`. No login credentials are required by this student demo.
 
 ## API overview
 
